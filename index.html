@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>WCM 知识闯关</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>WCM 知识闯关</h1>
+      <p class="subtitle">10 关挑战 · 每关 30 秒 · 满分 100 分</p>
+    </div>
+
+    <div class="card" id="infoCard">
+      <div class="input-group">
+        <label>姓名</label>
+        <input type="text" id="nameInput" placeholder="请输入姓名" maxlength="20">
+      </div>
+      <div class="input-group">
+        <label>部门</label>
+        <input type="text" id="deptInput" placeholder="请输入部门" maxlength="20">
+      </div>
+      <div class="input-group">
+        <label>工段</label>
+        <input type="text" id="sectionInput" placeholder="请输入工段" maxlength="20">
+      </div>
+      <button class="btn btn-primary" id="startBtn" onclick="startGame()">开始答题</button>
+    </div>
+
+    <div class="card" id="bankInfo" style="text-align:center">
+      <p style="font-size:13px;color:var(--text-tertiary)" id="bankStatus">正在加载题库...</p>
+    </div>
+
+    <div style="margin-top:auto;padding:16px 0;text-align:center">
+      <a href="ranking.html" class="btn-link">查看排行榜</a>
+      &nbsp;
+      <a href="admin.html" class="btn-link">管理后台</a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const savedName = localStorage.getItem('wcm_name') || '';
+    const savedDept = localStorage.getItem('wcm_dept') || '';
+    const savedSection = localStorage.getItem('wcm_section') || '';
+    if (savedName) document.getElementById('nameInput').value = savedName;
+    if (savedDept) document.getElementById('deptInput').value = savedDept;
+    if (savedSection) document.getElementById('sectionInput').value = savedSection;
+
+    document.getElementById('nameInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') document.getElementById('deptInput').focus();
+    });
+
+    async function loadBankInfo() {
+      const questions = await CloudDB.getQuestions();
+      const el = document.getElementById('bankStatus');
+      if (questions.length === 0) {
+        el.textContent = '题库为空，请联系管理员导入题目';
+        el.style.color = 'var(--danger)';
+      } else {
+        const types = {
+          single: questions.filter(q => q.type === 'single').length,
+          multiple: questions.filter(q => q.type === 'multiple').length,
+          judge: questions.filter(q => q.type === 'judge').length
+        };
+        el.textContent = `题库 ${questions.length} 题（单选 ${types.single} / 多选 ${types.multiple} / 判断 ${types.judge}）`;
+      }
+    }
+
+    function startGame() {
+      const name = document.getElementById('nameInput').value.trim();
+      const dept = document.getElementById('deptInput').value.trim();
+      const section = document.getElementById('sectionInput').value.trim();
+
+      if (!name) { showToast('请输入姓名'); return; }
+      if (!dept) { showToast('请输入部门'); return; }
+      if (!section) { showToast('请输入工段'); return; }
+
+      localStorage.setItem('wcm_name', name);
+      localStorage.setItem('wcm_dept', dept);
+      localStorage.setItem('wcm_section', section);
+
+      const params = new URLSearchParams({ name, dept, section });
+      window.location.href = `game.html?${params}`;
+    }
+
+    loadBankInfo();
+  </script>
+</body>
+</html>

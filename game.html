@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>答题闯关 - WCM 知识闯关</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div id="loadingScreen" class="loading">
+      <div class="spinner"></div>
+      <p>正在加载题目...</p>
+    </div>
+
+    <div id="gameScreen" style="display:none;flex:1;flex-direction:column">
+      <div class="game-header">
+        <span class="level-badge" id="levelBadge">第 1 关</span>
+        <span class="score-display">得分 <strong id="scoreDisplay">0</strong></span>
+      </div>
+
+      <div class="timer-text" id="timerText">30</div>
+      <div class="timer-bar">
+        <div class="timer-fill" id="timerFill" style="width:100%"></div>
+      </div>
+
+      <div class="question-card" id="questionCard">
+        <span class="question-type single" id="questionType">单选题</span>
+        <div class="question-text" id="questionText"></div>
+        <div class="options" id="optionsContainer"></div>
+      </div>
+
+      <button class="btn btn-primary" id="submitBtn" onclick="submitAnswer()" disabled>确认答案</button>
+    </div>
+
+    <div id="resultScreen" style="display:none;flex:1;flex-direction:column;justify-content:center">
+      <div class="card result-card">
+        <div class="stars-row" id="resultStars"></div>
+        <div class="big-score" id="resultScore">0</div>
+        <div class="grade-display" id="resultGrade"></div>
+        <div class="info-row">
+          <div class="info-item">
+            <div class="num" id="resultTime">0"</div>
+            <div class="label">用时</div>
+          </div>
+          <div class="info-item">
+            <div class="num" id="resultLevel">10/10</div>
+            <div class="label">通关</div>
+          </div>
+        </div>
+        <p id="resultMsg" style="margin:16px 0;font-size:15px;color:var(--text-secondary)"></p>
+        <button class="btn btn-primary" onclick="location.href='index.html'">重新开始</button>
+        <button class="btn btn-outline" style="margin-top:8px" onclick="location.href='ranking.html'">查看排行榜</button>
+      </div>
+    </div>
+
+    <div id="failScreen" style="display:none;flex:1;flex-direction:column;justify-content:center">
+      <div class="card result-card">
+        <div style="font-size:48px;margin-bottom:16px">&#10060;</div>
+        <h2 style="font-size:22px;margin-bottom:8px">答题失败</h2>
+        <p id="failMsg" style="margin:12px 0;font-size:15px;color:var(--text-secondary)"></p>
+        <div style="margin:16px 0">
+          <span style="font-size:14px;color:var(--text-tertiary)">已通过 </span>
+          <strong id="failLevel" style="font-size:24px;color:var(--primary)">0</strong>
+          <span style="font-size:14px;color:var(--text-tertiary)"> / 10 关</span>
+        </div>
+        <button class="btn btn-primary" onclick="location.href='index.html'">重新挑战</button>
+        <button class="btn btn-outline" style="margin-top:8px" onclick="location.href='ranking.html'">查看排行榜</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    const playerName = getQueryParam('name');
+    const playerDept = getQueryParam('dept');
+    const playerSection = getQueryParam('section');
+
+    if (!playerName) { location.href = 'index.html'; }
+
+    let questions = [];
+    let currentLevel = 0;
+    let score = 0;
+    let totalStars = 0;
+    let selectedOptions = [];
+    let timerInterval = null;
+    let timeLeft = 30;
+    let questionStartTime = 0;
+    let totalTimeUsed = 0;
+
+    async function init() {
+      const bank = await CloudDB.getQuestions();
+      if (bank.length === 0) {
+        document.getElementById('loadingScreen').innerHTML =
+          '<p>题库为空，请联系管理员导入题目</p><button class="btn btn-outline" style="margin-top:16px" onclick="location.href=\'index.html\'">返回</button>';
+        return;
+      }
+      questions = pickQuestions(bank, CLOUD_CONFIG.totalLevels);
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.getElementById('gameScreen').style.display = 'flex';
+      showQuestion();
+    }
+
+    function showQuestion() {
+      const q = questions[currentLevel];
+      selectedOptions = [];
+      timeLeft = CLOUD_CONFIG.timePerQuestion;
+      questionStartTime = Date.now();
+
+      document.getElementById('levelBadge').textContent = `第 ${currentLevel + 1} 关`;
+      document.getElementById('scoreDisplay').textContent = score;
+
+      const typeEl = document.getElementById('questionType');
+      const typeMap = { single: '单选题', multiple: '多选题', judge: '判断题' };
+      const qType = q.type || 'single';
+      typeEl.textContent = typeMap[qType] || '单选题';
+      typeEl.className = `question-type ${qType}`;
+
+      document.getElementById('questionText').textContent = q.content;
+
+      const optsEl = document.getElementById('optionsContainer');
+      optsEl.innerHTML = '';
+      const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+      q.options.forEach((opt, i) => {
+        const div = document.createElement('div');
+        div.className = 'option';
+        div.onclick = () => selectOption(i);
+        div.innerHTML = `
+          <span class="option-label">${labels[i] || (i + 1)}</span>
+          <span class="option-text">${opt}</span>
+        `;
+        optsEl.appendChild(div);
+      });
+
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('submitBtn').textContent = qType === 'multiple' ? '确认答案（需全选对）' : '确认答案';
+
+      startTimer();
+    }
+
+    function selectOption(idx) {
+      const q = questions[currentLevel];
+      const qType = q.type || 'single';
+
+      if (qType === 'multiple') {
+        const pos = selectedOptions.indexOf(idx);
+        if (pos >= 0) {
+          selectedOptions.splice(pos, 1);
+        } else {
+          selectedOptions.push(idx);
+        }
+      } else {
+        selectedOptions = [idx];
+      }
+
+      document.querySelectorAll('.option').forEach((el, i) => {
+        el.classList.toggle('selected', selectedOptions.includes(i));
+      });
+
+      document.getElementById('submitBtn').disabled = selectedOptions.length === 0;
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      updateTimerDisplay();
+
+      timerInterval = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          handleTimeout();
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      document.getElementById('timerText').textContent = timeLeft;
+      const fill = document.getElementById('timerFill');
+      const pct = (timeLeft / CLOUD_CONFIG.timePerQuestion) * 100;
+      fill.style.width = pct + '%';
+      fill.className = 'timer-fill';
+      if (timeLeft <= 10) fill.classList.add('danger');
+      else if (timeLeft <= 20) fill.classList.add('warning');
+
+      const timerEl = document.getElementById('timerText');
+      timerEl.className = timeLeft <= 10 ? 'danger' : '';
+    }
+
+    function handleTimeout() {
+      const opts = document.querySelectorAll('.option');
+      const q = questions[currentLevel];
+      q.correctAnswers.forEach(idx => {
+        if (opts[idx]) opts[idx].classList.add('correct');
+      });
+      document.getElementById('submitBtn').disabled = true;
+      showToast('超时！', 1500);
+      setTimeout(() => gameOver(false, '超时未作答'), 1500);
+    }
+
+    function submitAnswer() {
+      clearInterval(timerInterval);
+      const q = questions[currentLevel];
+      const timeUsed = Math.round((Date.now() - questionStartTime) / 1000);
+      totalTimeUsed += timeUsed;
+
+      const isCorrect = checkAnswer(q, selectedOptions);
+      const opts = document.querySelectorAll('.option');
+
+      if (isCorrect) {
+        const stars = calcStars(timeUsed);
+        score += CLOUD_CONFIG.pointsPerQuestion;
+        totalStars += stars;
+
+        selectedOptions.forEach(idx => {
+          if (opts[idx]) opts[idx].classList.add('correct');
+        });
+
+        document.getElementById('submitBtn').disabled = true;
+        showToast(`${stars} 星! +${CLOUD_CONFIG.pointsPerQuestion}分`, 1200);
+
+        setTimeout(() => {
+          currentLevel++;
+          if (currentLevel >= CLOUD_CONFIG.totalLevels) {
+            gameWin();
+          } else {
+            showQuestion();
+          }
+        }, 1200);
+      } else {
+        selectedOptions.forEach(idx => {
+          if (opts[idx]) opts[idx].classList.add('wrong');
+        });
+        q.correctAnswers.forEach(idx => {
+          if (opts[idx]) opts[idx].classList.add('correct');
+        });
+        document.getElementById('submitBtn').disabled = true;
+        setTimeout(() => gameOver(false, '答错了'), 1500);
+      }
+    }
+
+    async function gameWin() {
+      document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('resultScreen').style.display = 'flex';
+
+      document.getElementById('resultStars').innerHTML = starsHtml(3);
+      document.getElementById('resultScore').textContent = score;
+      document.getElementById('resultGrade').innerHTML = gradeBadgeHtml(score, totalStars);
+      document.getElementById('resultTime').textContent = formatTime(totalTimeUsed);
+      document.getElementById('resultLevel').textContent = `${CLOUD_CONFIG.totalLevels}/${CLOUD_CONFIG.totalLevels}`;
+      document.getElementById('resultMsg').textContent = `恭喜 ${playerName}！全部通关！`;
+
+      await CloudDB.submitScore({
+        name: playerName,
+        department: playerDept,
+        section: playerSection,
+        score: score,
+        stars: totalStars,
+        timeUsed: totalTimeUsed,
+        levels: CLOUD_CONFIG.totalLevels,
+        completed: true
+      });
+
+      showToast('成绩已提交！', 2000);
+    }
+
+    function gameOver(isWin, reason) {
+      document.getElementById('gameScreen').style.display = 'none';
+      document.getElementById('failScreen').style.display = 'flex';
+      document.getElementById('failMsg').textContent = reason || '答题失败';
+      document.getElementById('failLevel').textContent = currentLevel;
+    }
+
+    init();
+  </script>
+</body>
+</html>

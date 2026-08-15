@@ -10,7 +10,7 @@
   <div class="container">
     <div class="header">
       <h1>排行榜</h1>
-      <p class="subtitle">按得分 / 星数 / 用时综合排名</p>
+      <p class="subtitle">同一用户按最佳成绩排名</p>
     </div>
 
     <div id="loadingBox" class="loading">
@@ -59,7 +59,7 @@
   </div>
 
   <script src="js/config.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/app.js?v=4"></script>
   <script>
     async function loadLeaderboard() {
       document.getElementById('loadingBox').style.display = 'block';
@@ -130,7 +130,7 @@
           <div class="rank-number">${rank}</div>
           <div class="rank-info">
             <div class="rank-name">${escapeHtml(s.name)}</div>
-            <div class="rank-detail">${escapeHtml(deptText)} · ${formatTime(s.timeUsed)} · <span style="color:${grade.color}">${grade.name}</span></div>
+            <div class="rank-detail">${escapeHtml(deptText)} · ${formatTime(s.timeUsed)} · <span style="color:${grade.color}">${grade.name}</span>${s.attempts > 1 ? ` · 挑战${s.attempts}次` : ''}</div>
           </div>
           <div class="rank-score">
             <div class="score-num">${s.score}</div>

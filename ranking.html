@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>排行榜 - WCM 知识闯关</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>排行榜</h1>
+      <p class="subtitle">按得分 / 星数 / 用时综合排名</p>
+    </div>
+
+    <div id="loadingBox" class="loading">
+      <div class="spinner"></div>
+      <p>正在加载排行榜...</p>
+    </div>
+
+    <div id="rankingContent" style="display:none;flex:1">
+      <div id="topThree" style="display:none;margin-bottom:16px">
+        <div class="card" style="padding:16px;display:flex;justify-content:space-around;align-items:flex-end">
+          <div style="text-align:center;order:2">
+            <div style="font-size:36px;margin-bottom:4px">🥇</div>
+            <div id="top1Name" style="font-weight:700;font-size:15px"></div>
+            <div id="top1Score" style="font-size:18px;font-weight:700;color:var(--primary);margin-top:4px"></div>
+            <div id="top1Stars" style="font-size:12px;color:var(--amber);margin-top:2px"></div>
+          </div>
+          <div style="text-align:center;order:1">
+            <div style="font-size:28px;margin-bottom:4px">🥈</div>
+            <div id="top2Name" style="font-weight:600;font-size:13px"></div>
+            <div id="top2Score" style="font-size:16px;font-weight:700;color:var(--text-secondary);margin-top:4px"></div>
+            <div id="top2Stars" style="font-size:11px;color:var(--amber);margin-top:2px"></div>
+          </div>
+          <div style="text-align:center;order:3">
+            <div style="font-size:28px;margin-bottom:4px">🥉</div>
+            <div id="top3Name" style="font-weight:600;font-size:13px"></div>
+            <div id="top3Score" style="font-size:16px;font-weight:700;color:var(--text-secondary);margin-top:4px"></div>
+            <div id="top3Stars" style="font-size:11px;color:var(--amber);margin-top:2px"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ranking-list" id="rankingList"></div>
+
+      <div id="emptyRanking" class="empty-state" style="display:none">
+        <div class="icon">📊</div>
+        <p>暂无排行榜数据</p>
+        <p style="font-size:13px;margin-top:8px">快去答题，成为第一个上榜的人！</p>
+      </div>
+    </div>
+
+    <div style="margin-top:auto;padding:16px 0;text-align:center">
+      <button class="btn btn-outline" style="display:inline-block;width:auto;padding:12px 32px" onclick="loadLeaderboard()">刷新</button>
+      &nbsp;
+      <a href="index.html" class="btn-link">返回首页</a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    async function loadLeaderboard() {
+      document.getElementById('loadingBox').style.display = 'block';
+      document.getElementById('rankingContent').style.display = 'none';
+
+      const scores = await CloudDB.getLeaderboard();
+
+      document.getElementById('loadingBox').style.display = 'none';
+      document.getElementById('rankingContent').style.display = 'block';
+
+      const listEl = document.getElementById('rankingList');
+      const emptyEl = document.getElementById('emptyRanking');
+      const topThreeEl = document.getElementById('topThree');
+
+      if (scores.length === 0) {
+        listEl.innerHTML = '';
+        emptyEl.style.display = 'block';
+        topThreeEl.style.display = 'none';
+        return;
+      }
+
+      emptyEl.style.display = 'none';
+      listEl.innerHTML = '';
+
+      // Top 3 podium
+      if (scores.length >= 1) {
+        topThreeEl.style.display = 'block';
+        const s1 = scores[0];
+        document.getElementById('top1Name').textContent = s1.name;
+        document.getElementById('top1Score').textContent = s1.score + '分';
+        document.getElementById('top1Stars').textContent = '⭐'.repeat(Math.min(s1.stars, 30));
+
+        if (scores.length >= 2) {
+          const s2 = scores[1];
+          document.getElementById('top2Name').textContent = s2.name;
+          document.getElementById('top2Score').textContent = s2.score + '分';
+          document.getElementById('top2Stars').textContent = '⭐'.repeat(Math.min(s2.stars, 30));
+        } else {
+          document.getElementById('top2Name').textContent = '-';
+          document.getElementById('top2Score').textContent = '-';
+          document.getElementById('top2Stars').textContent = '';
+        }
+
+        if (scores.length >= 3) {
+          const s3 = scores[2];
+          document.getElementById('top3Name').textContent = s3.name;
+          document.getElementById('top3Score').textContent = s3.score + '分';
+          document.getElementById('top3Stars').textContent = '⭐'.repeat(Math.min(s3.stars, 30));
+        } else {
+          document.getElementById('top3Name').textContent = '-';
+          document.getElementById('top3Score').textContent = '-';
+          document.getElementById('top3Stars').textContent = '';
+        }
+      } else {
+        topThreeEl.style.display = 'none';
+      }
+
+      // Full list (skip top 3, they're shown in podium)
+      scores.forEach((s, i) => {
+        const rank = i + 1;
+        const div = document.createElement('div');
+        div.className = 'rank-item';
+
+        const grade = getWCMRank(s.score, s.stars);
+        const deptText = [s.department, s.section].filter(Boolean).join(' / ');
+
+        div.innerHTML = `
+          <div class="rank-number">${rank}</div>
+          <div class="rank-info">
+            <div class="rank-name">${escapeHtml(s.name)}</div>
+            <div class="rank-detail">${escapeHtml(deptText)} · ${formatTime(s.timeUsed)} · <span style="color:${grade.color}">${grade.name}</span></div>
+          </div>
+          <div class="rank-score">
+            <div class="score-num">${s.score}</div>
+            <div class="score-stars">⭐${s.stars}</div>
+          </div>
+        `;
+        listEl.appendChild(div);
+      });
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+
+    loadLeaderboard();
+  </script>
+</body>
+</html>

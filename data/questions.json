@@ -1,0 +1,685 @@
+[
+  {
+    "id": "c665a3a3bc36",
+    "type": "multiple",
+    "content": "WCM需要维持那些“0”？",
+    "options": [
+      "零事故",
+      "零故障",
+      "零缺陷",
+      "零短停",
+      "零投诉",
+      "零人工",
+      "零库存"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "dc1f0f1619eb",
+    "type": "multiple",
+    "content": "为什么做AM？",
+    "options": [
+      "快速消除设备劣化，大幅减少突发故障",
+      "提升设备综合效率（OEE）",
+      "降低维修成本和备件库存",
+      "培养员工的主人翁意识和技能",
+      "改善工作环境，夯实精益生产基础",
+      "为了让操作员替维修工干活",
+      "让生产可以无限制延长设备开机时长"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "f36726f589e3",
+    "type": "multiple",
+    "content": "为什么做初次清洁？",
+    "options": [
+      "让隐藏的“缺陷”彻底暴露",
+      "消除“污染源”和“难进入部位”，防止劣化加速",
+      "培养操作员对异常的“感知力”",
+      "发现并纠正“微缺陷”，避免大故障",
+      "发现问题、解决问题，恢复设备初始状态",
+      "有目的性的大检查",
+      "只需要保洁人员执行，操作员不用参与",
+      "完成厂区5S评比任务",
+      "可以直接省去后续所有设备点检工作"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "bb767014d989",
+    "type": "multiple",
+    "content": "AM为什么要有标签活动？",
+    "options": [
+      "将“看不见”的异常变得“看得见”",
+      "区分问题的“归属”与“状态”",
+      "防止“遗漏”和“半途而废”",
+      "量化改善成果，激励员工士气",
+      "标签是自主维护活动的“语言”，让现场目之所及的问题都有标签",
+      "增加员工负担",
+      "用标签可以直接替代设备日常点检工作"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "45a98c737c74",
+    "type": "multiple",
+    "content": "为什么要消减两源？",
+    "options": [
+      "防止“清洁—脏污—再清洁”的恶性循环",
+      "大幅降低维护作业的难度和时间",
+      "将“事后补救”转变为“源头预防”",
+      "把“天天忙着擦地”变成“让地不再脏”",
+      "把“忍着难用”变成“改得好用”",
+      "彻底取消所有清洁相关岗位，削减人力编制",
+      "可以不用做日常点检维护，只出问题再处理就行"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "9ec5f686a4cd",
+    "type": "multiple",
+    "content": "为什么需要CIL标准？",
+    "options": [
+      "确保执行的一致性与完整性",
+      "降低技能依赖，加速新员工上岗",
+      "为“防患于未然”提供可操作的依据",
+      "便于监督、考核与持续改善",
+      "将自主维护从“随意行为”转变为“可靠流程”的基石",
+      "标准不是束缚，而是让正确的事能够持续做对的保障",
+      "彻底取消老员工带教环节，新员工可直接独立上岗",
+      "统一标准后所有岗位操作完全一模一样，不用区分设备差异"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "5a7e01def1b1",
+    "type": "multiple",
+    "content": "AM审核的目的？",
+    "options": [
+      "验证自主维护是否“真做”，而非“演戏”",
+      "识别差距，明确改善方向",
+      "固化成果，防止退化",
+      "培养操作员的自主维护能力",
+      "确保自主维护不是一阵风，而是可持续、可验证、可提升的日常管理机制",
+      "确保自主维护不是一阵风，而是可持续、可验证、可提升的日常管理机制。不走过场，暴露真问题，帮助一线解决，并让优秀的班组得到认可",
+      "替代一线操作员完成日常自主维护工作",
+      "审核通过后就可以停止后续所有自主维护工作",
+      "只为完成上级检查指标，拿到考核分数即可"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "86284a0a3fd0",
+    "type": "multiple",
+    "content": "AM第一步初始清洁四大核心关键点的是（）",
+    "options": [
+      "安全",
+      "异常识别",
+      "标签",
+      "CILT",
+      "设备无大修"
+    ],
+    "correctAnswers": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "55471b4b0279",
+    "type": "single",
+    "content": "AM活动中100%代表什么？",
+    "options": [
+      "设备效率100%",
+      "员工参与率100%",
+      "标签移除率100%",
+      "产品合格率100%"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "99a531bba069",
+    "type": "single",
+    "content": "AM方法论第一步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "887dfd2394e4",
+    "type": "single",
+    "content": "AM方法论第二步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "3deab7e19c32",
+    "type": "single",
+    "content": "AM方法论第三步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      2
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "b0de9f7fd8aa",
+    "type": "single",
+    "content": "AM方法论第四步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "032d2b990712",
+    "type": "single",
+    "content": "AM方法论第五步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      4
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "a04c63d60069",
+    "type": "single",
+    "content": "AM方法论第六步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自生检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      5
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "cc1909b4566a",
+    "type": "single",
+    "content": "AM方法论第七步是什么？",
+    "options": [
+      "初姶清洁和检查",
+      "消除污染源和困难点",
+      "制定初步CILT标准",
+      "总检查",
+      "自主检查",
+      "标淮化",
+      "自我管理"
+    ],
+    "correctAnswers": [
+      6
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "be8e6ddc8cd1",
+    "type": "single",
+    "content": "CILT中的C表示什么？",
+    "options": [
+      "清洁",
+      "检查",
+      "润滑",
+      "紧固"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "ffeff5b13157",
+    "type": "single",
+    "content": "CILT中的I表示什么？",
+    "options": [
+      "清洁",
+      "检查",
+      "润滑",
+      "紧固"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "66a6092b4d4d",
+    "type": "single",
+    "content": "CILT中的L表示什么？",
+    "options": [
+      "清洁",
+      "检查",
+      "润滑",
+      "紧固"
+    ],
+    "correctAnswers": [
+      2
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "c6c17dd2d18d",
+    "type": "single",
+    "content": "CILT中的T表示什么？",
+    "options": [
+      "清洁",
+      "检查",
+      "润滑",
+      "紧固"
+    ],
+    "correctAnswers": [
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "213e04180215",
+    "type": "single",
+    "content": "AM第一步 “清洁即点检，点检即（）”",
+    "options": [
+      "预防",
+      "维修",
+      "改善"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "e905442e072b",
+    "type": "single",
+    "content": "AM第一步使用使用的LECD评估安全风险等级，L代表什么？",
+    "options": [
+      "事故发生可能性",
+      "人员暴露危险环境的频次",
+      "事故后果严重程度",
+      "综合风险等级分值"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "31aaa8f4961b",
+    "type": "single",
+    "content": "AM第一步使用使用的LECD评估安全风险等级，E代表什么？",
+    "options": [
+      "事故发生可能性",
+      "人员暴露危险环境的频次",
+      "事故后果严重程度",
+      "综合风险等级分值"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "698451dac838",
+    "type": "single",
+    "content": "AM第一步使用使用的LECD评估安全风险等级，C代表什么？",
+    "options": [
+      "事故发生可能性",
+      "人员暴露危险环境的频次",
+      "事故后果严重程度",
+      "综合风险等级分值"
+    ],
+    "correctAnswers": [
+      2
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "bdb37038c037",
+    "type": "single",
+    "content": "AM第一步使用使用的LECD评估安全风险等级，D代表什么？",
+    "options": [
+      "事故发生可能性",
+      "人员暴露危险环境的频次",
+      "事故后果严重程度",
+      "综合风险等级分值；D=L*E*C"
+    ],
+    "correctAnswers": [
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "47075855b2bf",
+    "type": "single",
+    "content": "利用五感进行检查发现异常，五感是",
+    "options": [
+      "看、听、闻、摸、尝",
+      "看、听、拍、吹、尝",
+      "望、闻、问、切、听"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "1937d3031e31",
+    "type": "single",
+    "content": "标签活动中，红色标签是什么标签？",
+    "options": [
+      "安全标签",
+      "食品安全标签",
+      "设备维修标签",
+      "自主维护标签"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "b02fcf703c44",
+    "type": "single",
+    "content": "标签活动中，绿色标签是什么标签？",
+    "options": [
+      "安全标签",
+      "食品安全标签",
+      "设备维修标签",
+      "自主维护标签"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "295f6472357a",
+    "type": "single",
+    "content": "标签活动中，黄色标签是什么标签？",
+    "options": [
+      "安全标签",
+      "食品安全标签",
+      "设备维修标签",
+      "自主维护标签"
+    ],
+    "correctAnswers": [
+      2
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "f6ae6dd9aff9",
+    "type": "single",
+    "content": "标签活动中，蓝色标签是什么标签？",
+    "options": [
+      "安全标签",
+      "食品安全标签",
+      "设备维修标签",
+      "自主维护标签"
+    ],
+    "correctAnswers": [
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "9ee2cbe61458",
+    "type": "single",
+    "content": "AM第二步 “消除两源” 中的两源指（）",
+    "options": [
+      "故障源、停机源",
+      "污染源、困难源",
+      "安全源、质量源"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "b773710c0ca0",
+    "type": "single",
+    "content": "关于污染源描述正确的是（）",
+    "options": [
+      "被油污、废料覆盖的设备表面就是污染源",
+      "污染源是持续产生脏污的源头，而非被污染位置",
+      "仅通过频繁清洁就能彻底解决污染源带来的问题"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "6a9201c7df8b",
+    "type": "single",
+    "content": "治理污染源的对策优先级从高到低排序正确的是（）",
+    "options": [
+      "断→减→离→易",
+      "易→离→减→断",
+      "减→断→易→离"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "7393be28171e",
+    "type": "single",
+    "content": "优化润滑的ECRS方法中，E表示什么？",
+    "options": [
+      "取消",
+      "合并",
+      "重排",
+      "简化"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "778e826dd7ba",
+    "type": "single",
+    "content": "优化润滑的ECRS方法中，C表示什么？",
+    "options": [
+      "取消",
+      "合并",
+      "重排",
+      "简化"
+    ],
+    "correctAnswers": [
+      1
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "9109985e54f9",
+    "type": "single",
+    "content": "优化润滑的ECRS方法中，R表示什么？",
+    "options": [
+      "取消",
+      "合并",
+      "重排",
+      "简化"
+    ],
+    "correctAnswers": [
+      2
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "d89cc03f9f33",
+    "type": "single",
+    "content": "优化润滑的ECRS方法中，S表示什么？",
+    "options": [
+      "取消",
+      "合并",
+      "重排",
+      "简化"
+    ],
+    "correctAnswers": [
+      3
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  },
+  {
+    "id": "7acefa01212f",
+    "type": "judge",
+    "content": "设备高处、狭小夹缝人手难以伸入，属于难以清洁类困难源。",
+    "options": [
+      "对",
+      "错"
+    ],
+    "correctAnswers": [
+      0
+    ],
+    "explain": "",
+    "source": "AM1-3步知识点.docx"
+  }
+]

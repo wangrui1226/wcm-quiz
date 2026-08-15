@@ -128,7 +128,13 @@
       <!-- Score Management -->
       <div class="admin-section">
         <h3>成绩管理</h3>
-        <button class="btn btn-outline" style="font-size:14px" onclick="viewScores()">查看全部成绩</button>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-outline" style="flex:1;font-size:14px" onclick="viewScores()">查看全部成绩</button>
+          <button class="btn btn-danger" style="flex:1;font-size:14px" id="clearScoresBtn" onclick="confirmClearScores()">清空排行榜</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-tertiary);margin-top:8px">
+          清空排行榜将删除全部成绩记录，所有人重新排名。此操作不可撤销。
+        </p>
         <div id="scoreList" style="margin-top:12px;max-height:400px;overflow-y:auto"></div>
       </div>
 
@@ -147,7 +153,7 @@
   </div>
 
   <script src="js/config.js?v=3"></script>
-  <script src="js/app.js?v=4"></script>
+  <script src="js/app.js?v=5"></script>
   <script>
     let adminAuthed = false;
     let currentQuestions = [];
@@ -333,6 +339,37 @@
         loadStats();
       } else {
         showToast('清空失败，请重试', 2000);
+      }
+    }
+
+    async function confirmClearScores() {
+      const scores = await CloudDB.getLeaderboard();
+      if (scores.length === 0) {
+        showToast('排行榜已为空', 1500);
+        return;
+      }
+      if (!confirm(`确定要清空排行榜吗？\n当前共有 ${scores.length} 名用户的成绩记录。\n清空后所有人重新排名！`)) return;
+      if (!confirm('再次确认：真的要删除全部成绩记录吗？\n此操作不可撤销！')) return;
+      doClearScores();
+    }
+
+    async function doClearScores() {
+      const btn = document.getElementById('clearScoresBtn');
+      btn.disabled = true;
+      btn.textContent = '清空中...';
+      showToast('正在删除成绩记录，请稍候...', 3000);
+
+      const ok = await CloudDB.clearScores();
+
+      btn.disabled = false;
+      btn.textContent = '清空排行榜';
+
+      if (ok) {
+        showToast('排行榜已清空，重新排名生效', 2500);
+        document.getElementById('scoreList').innerHTML = '';
+        loadStats();
+      } else {
+        showToast('清空失败，请重试', 2500);
       }
     }
 

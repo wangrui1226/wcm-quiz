@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>管理后台 - WCM 知识闯关</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>管理后台</h1>
+      <p class="subtitle">题库管理 · 成绩查看</p>
+    </div>
+
+    <!-- Login -->
+    <div class="card" id="loginCard">
+      <div class="input-group">
+        <label>管理密码</label>
+        <input type="password" id="pwdInput" placeholder="请输入管理密码" maxlength="30">
+      </div>
+      <button class="btn btn-primary" id="loginBtn" onclick="adminLogin()">进入后台</button>
+    </div>
+
+    <!-- Admin Panel -->
+    <div id="adminPanel" style="display:none;flex:1">
+
+      <!-- Stats -->
+      <div class="admin-section">
+        <h3>题库概览</h3>
+        <div class="stat-grid" id="statGrid">
+          <div class="stat-box"><div class="num" id="statTotal">-</div><div class="label">总题数</div></div>
+          <div class="stat-box"><div class="num" id="statSingle">-</div><div class="label">单选题</div></div>
+          <div class="stat-box"><div class="num" id="statMultiple">-</div><div class="label">多选题</div></div>
+          <div class="stat-box"><div class="num" id="statJudge">-</div><div class="label">判断题</div></div>
+          <div class="stat-box"><div class="num" id="statScores">-</div><div class="label">成绩数</div></div>
+          <div class="stat-box"><div class="num" id="statPlayers">-</div><div class="label">参与人数</div></div>
+        </div>
+        <button class="btn btn-outline" style="margin-top:12px;font-size:14px" onclick="loadStats()">刷新统计</button>
+      </div>
+
+      <!-- Upload Questions -->
+      <div class="admin-section">
+        <h3>上传题库</h3>
+        <p style="font-size:13px;color:var(--text-tertiary);margin-bottom:12px">
+          支持 JSON 格式，每题包含：type(single/multiple/judge)、content、options(数组)、correctAnswers(索引数组)
+        </p>
+
+        <div style="margin-bottom:12px">
+          <button class="btn btn-outline" style="font-size:14px" onclick="document.getElementById('fileInput').click()">选择 JSON 文件导入</button>
+          <input type="file" id="fileInput" accept=".json" style="display:none" onchange="handleFileUpload(event)">
+        </div>
+
+        <div style="margin-bottom:12px;text-align:center">
+          <span style="font-size:13px;color:var(--text-tertiary)">或</span>
+        </div>
+
+        <div class="input-group">
+          <label>手动输入 JSON</label>
+          <textarea id="jsonInput" rows="8" placeholder='[
+  {
+    "type": "single",
+    "content": "示例题目？",
+    "options": ["选项A", "选项B", "选项C", "选项D"],
+    "correctAnswers": [0]
+  },
+  {
+    "type": "multiple",
+    "content": "多选题示例？",
+    "options": ["选项A", "选项B", "选项C"],
+    "correctAnswers": [0, 2]
+  },
+  {
+    "type": "judge",
+    "content": "判断题示例？",
+    "options": ["正确", "错误"],
+    "correctAnswers": [0]
+  }
+]' style="width:100%;padding:12px;font-size:14px;border:2px solid var(--border);border-radius:8px;font-family:monospace;resize:vertical"></textarea>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" id="appendBtn" onclick="uploadQuestions(false)">追加导入</button>
+          <button class="btn btn-teal" style="flex:1" id="replaceBtn" onclick="uploadQuestions(true)">替换全部</button>
+        </div>
+        <p style="font-size:12px;color:var(--text-tertiary);margin-top:8px">
+          追加导入：在现有题库后添加新题<br>
+          替换全部：清空旧题库，用新题库替换
+        </p>
+      </div>
+
+      <!-- Question List -->
+      <div class="admin-section">
+        <h3>当前题库 <button class="btn-link" style="float:right;font-size:13px" onclick="exportQuestions()">导出</button></h3>
+        <div id="questionList" style="max-height:400px;overflow-y:auto">
+          <div class="loading" style="padding:20px"><p>点击刷新统计加载题库</p></div>
+        </div>
+      </div>
+
+      <!-- Score Management -->
+      <div class="admin-section">
+        <h3>成绩管理</h3>
+        <button class="btn btn-outline" style="font-size:14px" onclick="viewScores()">查看全部成绩</button>
+        <div id="scoreList" style="margin-top:12px;max-height:400px;overflow-y:auto"></div>
+      </div>
+
+      <!-- Danger Zone -->
+      <div class="admin-section" style="border:2px solid var(--danger)">
+        <h3 style="color:var(--danger)">危险操作</h3>
+        <button class="btn btn-danger" id="clearBtn" onclick="confirmClearQuestions()">清空全部题库</button>
+        <p style="font-size:12px;color:var(--text-tertiary);margin-top:8px">此操作不可撤销，请谨慎操作</p>
+      </div>
+
+    </div>
+
+    <div style="margin-top:auto;padding:16px 0;text-align:center">
+      <a href="index.html" class="btn-link">返回首页</a>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/app.js"></script>
+  <script>
+    let adminAuthed = false;
+    let currentQuestions = [];
+
+    document.getElementById('pwdInput').addEventListener('keypress', e => {
+      if (e.key === 'Enter') adminLogin();
+    });
+
+    function adminLogin() {
+      const pwd = document.getElementById('pwdInput').value.trim();
+      if (pwd === CLOUD_CONFIG.adminPassword) {
+        adminAuthed = true;
+        document.getElementById('loginCard').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadStats();
+        showToast('登录成功', 1500);
+      } else {
+        showToast('密码错误', 2000);
+      }
+    }
+
+    async function loadStats() {
+      showToast('加载中...', 1000);
+      const questions = await CloudDB.getQuestions();
+      currentQuestions = questions;
+
+      const single = questions.filter(q => (q.type || 'single') === 'single').length;
+      const multiple = questions.filter(q => q.type === 'multiple').length;
+      const judge = questions.filter(q => q.type === 'judge').length;
+
+      document.getElementById('statTotal').textContent = questions.length;
+      document.getElementById('statSingle').textContent = single;
+      document.getElementById('statMultiple').textContent = multiple;
+      document.getElementById('statJudge').textContent = judge;
+
+      // Load scores count
+      const scores = await CloudDB.getLeaderboard();
+      document.getElementById('statScores').textContent = scores.length;
+      const uniqueNames = new Set(scores.map(s => s.name));
+      document.getElementById('statPlayers').textContent = uniqueNames.size;
+
+      renderQuestionList(questions);
+    }
+
+    function renderQuestionList(questions) {
+      const el = document.getElementById('questionList');
+      if (questions.length === 0) {
+        el.innerHTML = '<div class="empty-state" style="padding:20px"><p>题库为空</p></div>';
+        return;
+      }
+
+      const typeMap = { single: '单选', multiple: '多选', judge: '判断' };
+      const typeClass = { single: 'single', multiple: 'multiple', judge: 'judge' };
+
+      el.innerHTML = questions.map((q, i) => {
+        const qType = q.type || 'single';
+        const correctLabels = (q.correctAnswers || []).map(idx => {
+          const labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G'];
+          return labels[idx] || (idx + 1);
+        }).join(', ');
+        return `
+          <div style="padding:12px 0;border-bottom:1px solid var(--border)">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+              <span style="font-size:12px;color:var(--text-tertiary)">#${i + 1}</span>
+              <span class="question-type ${typeClass[qType]}" style="margin-bottom:0">${typeMap[qType]}</span>
+            </div>
+            <div style="font-size:14px;font-weight:500;margin-bottom:4px">${escapeHtml(q.content)}</div>
+            <div style="font-size:12px;color:var(--teal)">正确答案: ${correctLabels}</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('jsonInput').value = e.target.result;
+        showToast('文件已读取，请选择追加或替换', 2000);
+      };
+      reader.readAsText(file);
+    }
+
+    async function uploadQuestions(replace) {
+      const jsonText = document.getElementById('jsonInput').value.trim();
+      if (!jsonText) {
+        showToast('请输入或上传 JSON 数据', 2000);
+        return;
+      }
+
+      let newQuestions;
+      try {
+        newQuestions = JSON.parse(jsonText);
+        if (!Array.isArray(newQuestions)) {
+          showToast('JSON 必须是数组格式', 2000);
+          return;
+        }
+      } catch (e) {
+        showToast('JSON 格式错误: ' + e.message, 3000);
+        return;
+      }
+
+      // Validate
+      for (let i = 0; i < newQuestions.length; i++) {
+        const q = newQuestions[i];
+        if (!q.content || !Array.isArray(q.options) || !Array.isArray(q.correctAnswers)) {
+          showToast(`第 ${i + 1} 题格式错误，需包含 content/options/correctAnswers`, 3000);
+          return;
+        }
+        if (!q.type) q.type = 'single';
+      }
+
+      const btn = replace ? document.getElementById('replaceBtn') : document.getElementById('appendBtn');
+      btn.disabled = true;
+      btn.textContent = '上传中...';
+
+      const finalQuestions = replace ? newQuestions : [...currentQuestions, ...newQuestions];
+      const ok = await CloudDB.saveQuestions(finalQuestions);
+
+      btn.disabled = false;
+      btn.textContent = replace ? '替换全部' : '追加导入';
+
+      if (ok) {
+        showToast(`成功${replace ? '替换' : '追加'} ${newQuestions.length} 题`, 2000);
+        document.getElementById('jsonInput').value = '';
+        document.getElementById('fileInput').value = '';
+        loadStats();
+      } else {
+        showToast('上传失败，请检查网络和配置', 3000);
+      }
+    }
+
+    function exportQuestions() {
+      if (currentQuestions.length === 0) {
+        showToast('题库为空', 1500);
+        return;
+      }
+      const blob = new Blob([JSON.stringify(currentQuestions, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `questions_${Date.now()}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('已导出', 1500);
+    }
+
+    function confirmClearQuestions() {
+      if (currentQuestions.length === 0) {
+        showToast('题库已为空', 1500);
+        return;
+      }
+      if (confirm(`确定要清空全部 ${currentQuestions.length} 道题目吗？\n此操作不可撤销！`)) {
+        if (confirm('再次确认：真的要清空全部题库吗？')) {
+          doClearQuestions();
+        }
+      }
+    }
+
+    async function doClearQuestions() {
+      const btn = document.getElementById('clearBtn');
+      btn.disabled = true;
+      btn.textContent = '清空中...';
+
+      const ok = await CloudDB.clearQuestions();
+
+      btn.disabled = false;
+      btn.textContent = '清空全部题库';
+
+      if (ok) {
+        showToast('题库已清空', 2000);
+        loadStats();
+      } else {
+        showToast('清空失败，请重试', 2000);
+      }
+    }
+
+    async function viewScores() {
+      const el = document.getElementById('scoreList');
+      el.innerHTML = '<div class="loading" style="padding:20px"><div class="spinner"></div><p>加载中...</p></div>';
+
+      const scores = await CloudDB.getLeaderboard();
+
+      if (scores.length === 0) {
+        el.innerHTML = '<div class="empty-state" style="padding:20px"><p>暂无成绩</p></div>';
+        return;
+      }
+
+      el.innerHTML = scores.map((s, i) => {
+        const grade = getWCMRank(s.score, s.stars);
+        const deptText = [s.department, s.section].filter(Boolean).join(' / ');
+        const date = new Date(s.timestamp).toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+        return `
+          <div class="rank-item">
+            <div class="rank-number">${i + 1}</div>
+            <div class="rank-info">
+              <div class="rank-name">${escapeHtml(s.name)}</div>
+              <div class="rank-detail">${escapeHtml(deptText)} · ${formatTime(s.timeUsed)} · ${date}</div>
+            </div>
+            <div class="rank-score">
+              <div class="score-num">${s.score}</div>
+              <div class="score-stars">⭐${s.stars}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text || '';
+      return div.innerHTML;
+    }
+  </script>
+</body>
+</html>

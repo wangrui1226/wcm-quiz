@@ -7,6 +7,17 @@
 const CloudDB = {
   cfg: window.CLOUD_CONFIG,
 
+  // 同源 URL（GitHub Pages 本身托管，国内最稳定）
+  pagesUrl(path) {
+    return `./${path}?t=${Date.now()}`;
+  },
+
+  // jsdelivr CDN 备用
+  cdnUrl(path) {
+    return `https://cdn.jsdelivr.net/gh/${this.cfg.githubOwner}/${this.cfg.githubRepo}@${this.cfg.branch}/${path}?t=${Date.now()}`;
+  },
+
+  // raw.githubusercontent.com 备用
   rawUrl(path) {
     return `https://raw.githubusercontent.com/${this.cfg.githubOwner}/${this.cfg.githubRepo}/${this.cfg.branch}/${path}?t=${Date.now()}`;
   },
@@ -16,14 +27,22 @@ const CloudDB = {
   },
 
   async getQuestions() {
-    try {
-      const res = await fetch(this.rawUrl('data/questions.json'));
-      if (!res.ok) return [];
-      return await res.json();
-    } catch (e) {
-      console.error('getQuestions:', e);
-      return [];
+    // 依次尝试：同源 → jsdelivr CDN → raw.githubusercontent
+    const urls = [
+      this.pagesUrl('data/questions.json'),
+      this.cdnUrl('data/questions.json'),
+      this.rawUrl('data/questions.json')
+    ];
+    for (const url of urls) {
+      try {
+        const res = await fetch(url);
+        if (res.ok) {
+          const data = await res.json();
+          if (Array.isArray(data) && data.length > 0) return data;
+        }
+      } catch (e) { /* try next */ }
     }
+    return [];
   },
 
   async saveQuestions(questions) {

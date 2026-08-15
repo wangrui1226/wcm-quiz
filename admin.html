@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>管理后台 - WCM 知识闯关</title>
-  <link rel="stylesheet" href="css/style.css?v=2">
+  <link rel="stylesheet" href="css/style.css?v=3">
 </head>
 <body>
   <div class="container">
@@ -39,9 +39,53 @@
         <button class="btn btn-outline" style="margin-top:12px;font-size:14px" onclick="loadStats()">刷新统计</button>
       </div>
 
+      <!-- Add Single Question -->
+      <div class="admin-section" id="addQuestionSection">
+        <h3>添加题目</h3>
+
+        <div class="input-group">
+          <label>题型</label>
+          <select id="qType" onchange="onTypeChange()" style="width:100%;padding:12px 16px;font-size:16px;border:2px solid var(--border);border-radius:8px;background:var(--card);-webkit-appearance:none">
+            <option value="single">单选题</option>
+            <option value="multiple">多选题</option>
+            <option value="judge">判断题</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>题干内容</label>
+          <textarea id="qContent" rows="3" placeholder="请输入题目内容..." style="width:100%;padding:12px;font-size:14px;border:2px solid var(--border);border-radius:8px;resize:vertical"></textarea>
+        </div>
+
+        <div class="input-group" id="optionsGroup">
+          <label>选项设置 <span style="font-size:12px;color:var(--text-tertiary)">（点击选项左侧圆圈标记正确答案）</span></label>
+          <div id="optionsContainer"></div>
+          <button class="btn btn-outline" style="font-size:13px;padding:8px;margin-top:8px" id="addOptionBtn" onclick="addOption()">+ 添加选项</button>
+        </div>
+
+        <div id="judgeHint" style="display:none;margin-bottom:12px">
+          <div style="font-size:13px;color:var(--text-tertiary);margin-bottom:8px;padding:8px 12px;background:var(--teal-light);border-radius:8px">
+            判断题自动生成"正确"和"错误"两个选项，请选择正确答案
+          </div>
+          <div style="display:flex;gap:12px">
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:8px;font-size:15px">
+              <input type="radio" name="judgeAnswer" value="0"> 正确
+            </label>
+            <label style="display:flex;align-items:center;gap:6px;cursor:pointer;padding:10px 20px;border:2px solid var(--border);border-radius:8px;font-size:15px">
+              <input type="radio" name="judgeAnswer" value="1"> 错误
+            </label>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-primary" style="flex:1" id="saveQuestionBtn" onclick="saveSingleQuestion()">保存题目</button>
+          <button class="btn btn-outline" style="flex:0 0 auto;padding:16px 20px;font-size:14px" onclick="resetAddForm()">清空表单</button>
+        </div>
+      </div>
+
       <!-- Upload Questions -->
       <div class="admin-section">
-        <h3>上传题库</h3>
+        <h3>批量导入题库</h3>
         <p style="font-size:13px;color:var(--text-tertiary);margin-bottom:12px">
           支持 JSON 格式，每题包含：type(single/multiple/judge)、content、options(数组)、correctAnswers(索引数组)
         </p>
@@ -57,23 +101,11 @@
 
         <div class="input-group">
           <label>手动输入 JSON</label>
-          <textarea id="jsonInput" rows="8" placeholder='[
+          <textarea id="jsonInput" rows="6" placeholder='[
   {
     "type": "single",
     "content": "示例题目？",
     "options": ["选项A", "选项B", "选项C", "选项D"],
-    "correctAnswers": [0]
-  },
-  {
-    "type": "multiple",
-    "content": "多选题示例？",
-    "options": ["选项A", "选项B", "选项C"],
-    "correctAnswers": [0, 2]
-  },
-  {
-    "type": "judge",
-    "content": "判断题示例？",
-    "options": ["正确", "错误"],
     "correctAnswers": [0]
   }
 ]' style="width:100%;padding:12px;font-size:14px;border:2px solid var(--border);border-radius:8px;font-family:monospace;resize:vertical"></textarea>
@@ -83,16 +115,12 @@
           <button class="btn btn-primary" style="flex:1" id="appendBtn" onclick="uploadQuestions(false)">追加导入</button>
           <button class="btn btn-teal" style="flex:1" id="replaceBtn" onclick="uploadQuestions(true)">替换全部</button>
         </div>
-        <p style="font-size:12px;color:var(--text-tertiary);margin-top:8px">
-          追加导入：在现有题库后添加新题<br>
-          替换全部：清空旧题库，用新题库替换
-        </p>
       </div>
 
       <!-- Question List -->
       <div class="admin-section">
         <h3>当前题库 <button class="btn-link" style="float:right;font-size:13px" onclick="exportQuestions()">导出</button></h3>
-        <div id="questionList" style="max-height:400px;overflow-y:auto">
+        <div id="questionList" style="max-height:500px;overflow-y:auto">
           <div class="loading" style="padding:20px"><p>点击刷新统计加载题库</p></div>
         </div>
       </div>
@@ -118,8 +146,8 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2"></script>
-  <script src="js/app.js?v=2"></script>
+  <script src="js/config.js?v=3"></script>
+  <script src="js/app.js?v=3"></script>
   <script>
     let adminAuthed = false;
     let currentQuestions = [];
@@ -134,11 +162,20 @@
         adminAuthed = true;
         document.getElementById('loginCard').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
+        initAddForm();
         loadStats();
         showToast('登录成功', 1500);
       } else {
         showToast('密码错误', 2000);
       }
+    }
+
+    function initAddForm() {
+      optionCount = 0;
+      document.getElementById('optionsContainer').innerHTML = '';
+      addOption('');
+      addOption('');
+      onTypeChange();
     }
 
     async function loadStats() {
@@ -185,6 +222,7 @@
             <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
               <span style="font-size:12px;color:var(--text-tertiary)">#${i + 1}</span>
               <span class="question-type ${typeClass[qType]}" style="margin-bottom:0">${typeMap[qType]}</span>
+              <button class="btn-del" onclick="deleteQuestion(${i})" title="删除此题">✕</button>
             </div>
             <div style="font-size:14px;font-weight:500;margin-bottom:4px">${escapeHtml(q.content)}</div>
             <div style="font-size:12px;color:var(--teal)">正确答案: ${correctLabels}</div>
@@ -329,7 +367,184 @@
       }).join('');
     }
 
-    function escapeHtml(text) {
+    /* ========== 单题添加功能 ========== */
+    let optionCount = 0;
+
+    function onTypeChange() {
+      const type = document.getElementById('qType').value;
+      const optionsGroup = document.getElementById('optionsGroup');
+      const judgeHint = document.getElementById('judgeHint');
+      const addOptionBtn = document.getElementById('addOptionBtn');
+
+      if (type === 'judge') {
+        optionsGroup.style.display = 'none';
+        judgeHint.style.display = 'block';
+        addOptionBtn.style.display = 'none';
+      } else {
+        optionsGroup.style.display = 'block';
+        judgeHint.style.display = 'none';
+        addOptionBtn.style.display = 'block';
+      }
+    }
+
+    function addOption(text) {
+      const container = document.getElementById('optionsContainer');
+      const idx = optionCount;
+      const div = document.createElement('div');
+      div.className = 'option-edit-row';
+      div.dataset.idx = idx;
+      div.innerHTML = `
+        <div class="option-edit-circle" onclick="toggleCorrect(this)" data-correct="false">${String.fromCharCode(65 + idx)}</div>
+        <input type="text" class="option-edit-input" placeholder="选项 ${String.fromCharCode(65 + idx)}" value="${text || ''}" maxlength="200">
+        <button class="option-edit-del" onclick="removeOption(this)" title="删除选项">✕</button>
+      `;
+      container.appendChild(div);
+      optionCount++;
+      relabelOptions();
+    }
+
+    function removeOption(btn) {
+      const row = btn.closest('.option-edit-row');
+      row.remove();
+      relabelOptions();
+    }
+
+    function relabelOptions() {
+      const rows = document.querySelectorAll('.option-edit-row');
+      rows.forEach((row, i) => {
+        const circle = row.querySelector('.option-edit-circle');
+        const input = row.querySelector('.option-edit-input');
+        circle.textContent = String.fromCharCode(65 + i);
+        input.placeholder = '选项 ' + String.fromCharCode(65 + i);
+      });
+    }
+
+    function toggleCorrect(circle) {
+      const type = document.getElementById('qType').value;
+      const isCorrect = circle.dataset.correct === 'true';
+
+      if (type === 'single') {
+        document.querySelectorAll('.option-edit-circle').forEach(c => {
+          c.dataset.correct = 'false';
+          c.classList.remove('correct');
+        });
+        circle.dataset.correct = 'true';
+        circle.classList.add('correct');
+      } else {
+        circle.dataset.correct = isCorrect ? 'false' : 'true';
+        circle.classList.toggle('correct', !isCorrect);
+      }
+    }
+
+    function getCorrectAnswers() {
+      const type = document.getElementById('qType').value;
+      if (type === 'judge') {
+        return [];
+      }
+      const answers = [];
+      document.querySelectorAll('.option-edit-row').forEach((row, i) => {
+        const circle = row.querySelector('.option-edit-circle');
+        if (circle.dataset.correct === 'true') answers.push(i);
+      });
+      return answers;
+    }
+
+    function resetAddForm() {
+      document.getElementById('qType').value = 'single';
+      document.getElementById('qContent').value = '';
+      initAddForm();
+    }
+
+    async function saveSingleQuestion() {
+      const type = document.getElementById('qType').value;
+      const content = document.getElementById('qContent').value.trim();
+
+      if (!content) {
+        showToast('请输入题干内容', 2000);
+        return;
+      }
+
+      let options = [];
+      let correctAnswers = [];
+
+      if (type === 'judge') {
+        const correctIsTrue = document.querySelector('input[name="judgeAnswer"]:checked');
+        if (!correctIsTrue) {
+          showToast('请选择正确答案', 2000);
+          return;
+        }
+        options = ['正确', '错误'];
+        correctAnswers = [parseInt(correctIsTrue.value)];
+      } else {
+        const rows = document.querySelectorAll('.option-edit-row');
+        if (rows.length < 2) {
+          showToast('至少需要2个选项', 2000);
+          return;
+        }
+        rows.forEach(row => {
+          const input = row.querySelector('.option-edit-input');
+          options.push(input.value.trim());
+        });
+
+        if (options.some(o => !o)) {
+          showToast('选项内容不能为空', 2000);
+          return;
+        }
+
+        correctAnswers = getCorrectAnswers();
+        if (correctAnswers.length === 0) {
+          showToast('请标记正确答案（点击选项左侧圆圈）', 3000);
+          return;
+        }
+
+        if (type === 'single' && correctAnswers.length > 1) {
+          showToast('单选题只能有1个正确答案', 2000);
+          return;
+        }
+      }
+
+      const newQ = { type, content, options, correctAnswers };
+
+      const btn = document.getElementById('saveQuestionBtn');
+      btn.disabled = true;
+      btn.textContent = '保存中...';
+
+      const updated = [...currentQuestions, newQ];
+      const ok = await CloudDB.saveQuestions(updated);
+
+      btn.disabled = false;
+      btn.textContent = '保存题目';
+
+      if (ok) {
+        showToast('题目已添加', 2000);
+        resetAddForm();
+        loadStats();
+      } else {
+        showToast('保存失败，请重试', 3000);
+      }
+    }
+
+    async function deleteQuestion(index) {
+      const q = currentQuestions[index];
+      if (!q) return;
+
+      const preview = q.content.length > 30 ? q.content.substring(0, 30) + '...' : q.content;
+      if (!confirm(`确定删除第 ${index + 1} 题？\n"${preview}"\n此操作不可撤销`)) return;
+
+      const updated = currentQuestions.filter((_, i) => i !== index);
+
+      showToast('删除中...', 1000);
+      const ok = await CloudDB.saveQuestions(updated);
+
+      if (ok) {
+        showToast('已删除', 1500);
+        loadStats();
+      } else {
+        showToast('删除失败，请重试', 3000);
+      }
+    }
+
+    /* ========== 批量导入功能 ========== */
       const div = document.createElement('div');
       div.textContent = text || '';
       return div.innerHTML;

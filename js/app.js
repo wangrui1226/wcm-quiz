@@ -53,6 +53,39 @@ const CloudDB = {
     return await this.saveQuestions([]);
   },
 
+  // 清空排行榜：删除 scores/ 目录下所有成绩文件（保留 .gitkeep）
+  async clearScores() {
+    try {
+      const res = await fetch(this.apiUrl('scores'), {
+        headers: this._authHeaders()
+      });
+      if (!res.ok) return false;
+      const files = await res.json();
+      if (!Array.isArray(files)) return false;
+
+      const scoreFiles = files.filter(f => f.name !== '.gitkeep');
+      let deleted = 0;
+      for (const f of scoreFiles) {
+        const delRes = await fetch(this.apiUrl('scores/' + f.name), {
+          method: 'DELETE',
+          headers: this._authHeaders(),
+          body: JSON.stringify({
+            message: '清空排行榜: ' + f.name,
+            sha: f.sha,
+            branch: this.cfg.branch
+          })
+        });
+        if (delRes.ok) deleted++;
+        else console.error('删除失败: ' + f.name);
+      }
+      console.log(`已删除 ${deleted}/${scoreFiles.length} 条成绩`);
+      return true;
+    } catch (e) {
+      console.error('clearScores:', e);
+      return false;
+    }
+  },
+
   async submitScore(data) {
     const ts = Date.now();
     const rnd = Math.random().toString(36).slice(2, 8);

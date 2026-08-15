@@ -92,12 +92,31 @@ const CloudDB = {
         });
       }
 
-      scores.sort((a, b) => {
+      // 按用户去重：同一用户（姓名+部门+工段）只保留最佳成绩
+      const best = {};   // key -> 最佳成绩对象
+      const counts = {}; // key -> 挑战次数
+      for (const s of scores) {
+        const key = `${s.name}|${s.department}|${s.section}`;
+        counts[key] = (counts[key] || 0) + 1;
+        const cur = best[key];
+        const better = !cur
+          || s.score > cur.score
+          || (s.score === cur.score && s.stars > cur.stars)
+          || (s.score === cur.score && s.stars === cur.stars && s.timeUsed < cur.timeUsed);
+        if (better) best[key] = s;
+      }
+
+      const result = Object.values(best).map(s => ({
+        ...s,
+        attempts: counts[`${s.name}|${s.department}|${s.section}`]
+      }));
+
+      result.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
         if (b.stars !== a.stars) return b.stars - a.stars;
         return a.timeUsed - b.timeUsed;
       });
-      return scores;
+      return result;
     } catch (e) {
       console.error('getLeaderboard:', e);
       return [];

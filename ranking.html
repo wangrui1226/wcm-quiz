@@ -58,7 +58,7 @@
     </div>
   </div>
 
-  <script src="js/config.js?v=2"></script>
+  <script src="js/config.js?v=6"></script>
   <script src="js/app.js?v=5"></script>
   <script>
     async function loadLeaderboard() {
@@ -90,13 +90,13 @@
         const s1 = scores[0];
         document.getElementById('top1Name').textContent = s1.name;
         document.getElementById('top1Score').textContent = s1.score + '分';
-        document.getElementById('top1Stars').textContent = '⭐'.repeat(Math.min(s1.stars, 30));
+        document.getElementById('top1Stars').textContent = '⭐' + s1.stars;
 
         if (scores.length >= 2) {
           const s2 = scores[1];
           document.getElementById('top2Name').textContent = s2.name;
           document.getElementById('top2Score').textContent = s2.score + '分';
-          document.getElementById('top2Stars').textContent = '⭐'.repeat(Math.min(s2.stars, 30));
+          document.getElementById('top2Stars').textContent = '⭐' + s2.stars;
         } else {
           document.getElementById('top2Name').textContent = '-';
           document.getElementById('top2Score').textContent = '-';
@@ -107,7 +107,7 @@
           const s3 = scores[2];
           document.getElementById('top3Name').textContent = s3.name;
           document.getElementById('top3Score').textContent = s3.score + '分';
-          document.getElementById('top3Stars').textContent = '⭐'.repeat(Math.min(s3.stars, 30));
+          document.getElementById('top3Stars').textContent = '⭐' + s3.stars;
         } else {
           document.getElementById('top3Name').textContent = '-';
           document.getElementById('top3Score').textContent = '-';

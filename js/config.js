@@ -10,7 +10,7 @@ window.CLOUD_CONFIG = {
   branch: 'main',
   adminPassword: 'admin123',
   totalLevels: 10,
-  timePerQuestion: 30,
+  timePerQuestion: 50,
   pointsPerQuestion: 10,
   maxScore: 100,
   maxStars: 30
